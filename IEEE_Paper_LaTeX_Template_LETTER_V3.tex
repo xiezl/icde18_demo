@@ -63,22 +63,24 @@ the required format, you will be asked to fix it.
 %
 \section{Introduction}
 %
-Introduce cohort analysis.
+Trends in data analysis in recent decades.
 
-Introduce Cohana engine.
+Introduce cohort analysis. Discuss disadvantages on SQL solution.
 
-Introduce Cohana demo and contributions.
+Raise the health care example.
 
+\emph{\textbf{Example:} A hospital wants to know the side effects of a new medicine A on patients divided by different ages who are diagnosed with disease B. The monitoring on the effects begins after a patient taking the medicine at least 2 times, and is indicated by abnormal values in daily-conducted lab-test C.}
+
+We have designed Cohana (a cohort query engine) in previous paper. Cohana can handle the above query and meet the requirements of general cohort analysis in many areas.
+
+Further, we develop a web interface on top of Cohana to provide users intuitive and powerful cohort query services. It can...
+
+Contribution
 \begin{itemize}
 \item	C1
 \item   C2
 \item   C3
 \end{itemize}
-
-\section{Running Example}
-
-Add descriptions on medical preliminary and related examples.
-
 
 \section{System Overview}
 
@@ -88,15 +90,23 @@ Define Birth Event, Cohort Selection and Age.
 
 \subsection{System Architecture}
 
-Depict the back end and the front end
+Depict the back end and the front end. (Architecture figure) (data - cohort engine - web interface)
+
+Describe the data format, and configurations needed.
+
+Engine loads data. Web interface interactively shows options according to the data, and sends request to the engine. Engine executes the query and sends back results to be visualised.
 
 \section{Web User Interface}
 
-Show the procedure of submitting the dataset and running the query.
+Prepare data and load data.
+
+Explain options on the web page, and show how to solve the example problem.
+
+Explain the results (x/y axis and values). with support of third-party library, display different types of charts.
 
 \section{Related Work and Conclusion}
 
-
+MixPanel. Amplitude. 
 
 %\section*{Acknowledgment}
 
