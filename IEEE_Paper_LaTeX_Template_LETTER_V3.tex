@@ -80,7 +80,7 @@ Contribution
 \end{itemize}
 
 \section{System Overview}
-In this section, we briefly introduced the three key definitions in cohort query firstly, and then depict the overall system architecture, including the data pre-processing, the front-end web interface, and the back-end Cohana engine, to explain the whole process of a Cohort analysis.  
+In this section, we briefly introduce the three key definitions in cohort query firstly, and then depict the overall system architecture, including the data pre-processing, the front-end web interface, and the back-end Cohana engine, to explain the whole process of a Cohort analysis.  
 
 \subsection{Query Definition}
 As discussed in the previous section, a typical Cohort analysis requires defining \textbf{cohort}, \textbf{birth and age}, and \textbf{aggregation}. 
@@ -95,15 +95,18 @@ As discussed in the previous section, a typical Cohort analysis requires definin
 
 Figure 1 outlines the architecture including three components, i.e., data, Cohana engine and web interface, and data flow among the components.
 
-data we need: data set in csv format, table (describing the schema, on web interface?), cube (dimension and measure), dimension (automatically generated?) 
+\textbf{data we need: data set in csv format, table (describing the schema, on web interface?), cube (dimension and measure), dimension (automatically generated?) }
 
 The Cohana engine consists of parser, catalog, query executor and storage manager. The last two are the cores to support efficient cohort queries. The storage manager applies a chunking scheme and various compression techniques. To be more specific, we partition the data into chunks horizontally where every chunk stores precisely activity tuples of one user. Afterwards, different compression schemes are employed on columns regarding their types, i.e., Run-Length-Encoding for user identity column, two-level compression for string column and delta encoding scheme for integer column. On the other hand, the query executor generates a logical query plan in the form operator tree from the original cohort query and optimized by birth selections. After being executed on each data chunk in the storage manager, the query plan merge and present the results.
 
-Engine loads data. Web interface interactively shows options according to the data, and sends request to the engine. Engine executes the query and sends back results to be visualised.
+The web interface, implemented under Django framework, is responsible for all user interactions such as loading data, composing queries, and displaying visualized results. As long as user specify the dataset, the web interface will send it to the Cohana engine and extract the column information for options of cohort analysis. The web interface structures the birth event, cohort selection, and age in a natural-language way, such that users can map their requirements into the options with ease. After that, the options selected are translated into JSON file in the format requested by Cohana engine. In seconds, the result is sent back, parsed and visualized on the web page.
 
-\section{Web User Interface}
+\section{Demonstration Outlines}
 
-Prepare data and load data.
+We will walk through the whole system on the medical example in the Introduction section to illustrate the usage of the web interface for cohort analysis. Notice that, though the example is in medical area, such analysis is common in various domain and could be elegantly handled by our system.
+
+
+
 
 Explain options on the web page, and show how to solve the example problem.
 
