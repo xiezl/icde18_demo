@@ -50,10 +50,7 @@
 \maketitle
 %
 \begin{abstract} 
-For your paper to be published in the conference proceedings, you must
-use this document as both an instruction set and as a template into
-which you can type your own text.  If your paper does not conform to
-the required format, you will be asked to fix it.
+The tremendous volume of user behavior activities records generated in various domains provides data analysts an opportunity to mine insights towards the users. Cohort analysis, aiming to find user behavioral trends in large tables, is one of the most commonly used techniques. Regarding the fact that cohort analysis suffers from the traditional database systems in both operability and efficiency, we proposed a cohort query engine, i.e., Cohana. Taking advantage of the overwhelming performance of Cohana, we further present a comprehensive and powerful tool covering a majority of needs in cohort analysis, all the while requires intuitive and accessible operations. We demonstrate analytics can easily define their requirements, and conduct the analysis or verify their assumptions on user behavior in no time.
 \end{abstract}
 
 % NOTE keywords are not used for conference papers so do not populate them
@@ -63,17 +60,17 @@ the required format, you will be asked to fix it.
 %
 \section{Introduction}
 %
-Trends in data analysis in recent decades.
+In an era where most user activities are recorded electronically in either active or passive way, people reach the consensus that we can gain insights towards user behavior from that accumulated huge amount of data, which further brings both commercial and public interests. With the maturity of data storage and cleansing techniques, we are more keen on the analyzing and explaining the complete data.
 
-Introduce cohort analysis. Discuss disadvantages on SQL solution.
-
-Raise the health care example.
+The need of data analysis on the tabulated user activities records drives challenges on plain analytics techniques such as SQL GROUP BY, and thus emerged Cohort analysis. In fact, there are two decisive factors affecting human behavior [9]: aging and social changes, i.e., people change their behavior when they grow older, as well as the societies they live in evolve, precisely the conditions Cohort analysis takes into consideration while assessing. The Cohort analysis studies the human behavioral by determining: 1) the groups users belong to; 2) the births and ages of user activities; 3) aggregation methods in each group and age. With the three definitions, Cohort analysis provides abstract and complete descriptions on user behavior study. The following example is a standard issue in the medical area. Though apparently troublesome for SQL GROUP BY, it can be easily handled by Cohort analysis as long as the three definitions are settled.
 
 \emph{\textbf{Example:} A hospital wants to know the side effects of a new medicine A on patients divided by different ages who are diagnosed with disease B. The monitoring on the effects begins after a patient taking the medicine at least 2 times, and is indicated by abnormal values in daily-conducted lab-test C.}
 
-We have designed Cohana (a cohort query engine) in previous paper. Cohana can handle the above query and meet the requirements of general cohort analysis in many areas.
+However, it is both painful to specify and expensive to evaluate for cohort analysis in traditional database systems. Therefore, we designed the new cohort operators and proposed Cohaha[ref], an efficient cohort query processing engine. The cohort query is more concise and accurate than SQL query, and the specially designed storage manager and query executor in Cohona brings overwhelming performance superiority against traditional database systems. 
 
-Further, we develop a web interface on top of Cohana to provide users intuitive and powerful cohort query services. It can...
+Further, we develop a web interface on the top of Cohana to provide users intuitive and powerful cohort query services. Users determine the cohort analysis conditions by selecting options described in natural language interactively on the web page instead of writing cohort queries, which is acceptable for those without query knowledge. What's more, owing to the efficiency of the backend Cohana engine, the results of queries are displayed and visualized on the web page in no time. In one word, users can insight the data swiftly, accurately, and intuitively. 
+
+In this demo, we will walk through...
 
 Contribution
 \begin{itemize}
@@ -83,16 +80,24 @@ Contribution
 \end{itemize}
 
 \section{System Overview}
+In this section, we briefly introduced the three key definitions in cohort query firstly, and then depict the overall system architecture, including the data pre-processing, the front-end web interface, and the back-end Cohana engine, to explain the whole process of a Cohort analysis.  
 
 \subsection{Query Definition}
+As discussed in the previous section, a typical Cohort analysis requires defining \textbf{cohort}, \textbf{birth and age}, and \textbf{aggregation}. 
 
-Define Birth Event, Cohort Selection and Age.
+\textbf{Cohort -} Cohort refers to a group of users sharing some common characteristic. Users are separated into different cohorts according to the features they have when performing a given action for the first time. For example, we can cohort patients by the disease diagnosed when initially admitted to the hospital. Notice that the characteristics may change over time, and we cohort on the basis of features by the time of particular action.
+
+\textbf{Birth and age -} A user \emph{i} is considered born when firstly performing a specific birth event \emph{e}, and the birth time is exactly the time of that event, or -1 if \emph{i} never made \emph{e}. The age \emph{g} is to specify the time slice for aggregation since birth time. For example, if we define the birth event as taking lab test and age as one day, a patient firstly recorded the lab test on January 1st will be at age 1 on January 2nd. Another patient firstly taking the test on March 4th will also be at age 1 on March 5th, regardless of different birth time.
+
+\textbf{Aggregation -} Aggregation refers to the calculation function conducted on the user activity records within same cohort and age. Users can perform aggregation as simple as counting the occurrence, or as complex as fitting distribution. For example, we can check the retention rate of patients by counting off patients' admission records every month (i.e., age) after being discharged (i.e., birth event).
 
 \subsection{System Architecture}
 
-Depict the back end and the front end. (Architecture figure) (data - cohort engine - web interface)
+Figure 1 outlines the architecture including three components, i.e., data, Cohana engine and web interface, and data flow among the components.
 
-Describe the data format, and configurations needed.
+data we need: data set in csv format, table (describing the schema, on web interface?), cube (dimension and measure), dimension (automatically generated?) 
+
+The Cohana engine consists of parser, catalog, query executor and storage manager. The last two are the cores to support efficient cohort queries. The storage manager applies a chunking scheme and various compression techniques. To be more specific, we partition the data into chunks horizontally where every chunk stores precisely activity tuples of one user. Afterwards, different compression schemes are employed on columns regarding their types, i.e., Run-Length-Encoding for user identity column, two-level compression for string column and delta encoding scheme for integer column. On the other hand, the query executor generates a logical query plan in the form operator tree from the original cohort query and optimized by birth selections. After being executed on each data chunk in the storage manager, the query plan merge and present the results.
 
 Engine loads data. Web interface interactively shows options according to the data, and sends request to the engine. Engine executes the query and sends back results to be visualised.
 
