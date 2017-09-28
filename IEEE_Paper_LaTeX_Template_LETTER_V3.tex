@@ -10,6 +10,8 @@
 \documentclass[10pt,conference,letterpaper]{IEEEtran}
 \usepackage{times,amsmath}
 \usepackage{multirow}
+\usepackage{graphicx}
+\graphicspath{ {images/} }
 %
 \title{Cohana Demo}
 %
@@ -94,24 +96,49 @@ As discussed in the previous section, a typical Cohort analysis requires definin
 
 \subsection{System Architecture}
 
-\begin{center}
-\begin{tabular}
-\hline
-Item& Options & Description \\
-\hiline
-name& & unique values \\
-\hiline
-\multirow{5}{fieldType} & UserKey & user id \\
-& Action & birth/cohort events \\
-& ActionTime & time \\
-& Metric & aggregation values \\
-& Segment & normal string \\
-\end{tabular}
-\end{center}
+\includegraphics[width=0.4\textwidth]{arch.png}
 
 Figure 1 outlines the architecture including three components, i.e., data, Cohana engine and web interface, and data flow among the components.
 
-The data we required includes a CSV file of user activity records dataset, and two auxiliary YAML files stating the fields and dimensions of the dataset respectively. The activity records should be sorted by user id, and the records for each user are in chronological order, which facilitates finding the birth activity tuple. It is a ubiquitous format for data analysis, especially cohort analysis, and reasonably simple to achieve once and for all. The field file lists the name, fieldType, and dataType for each column in the dataset, while the dimension file lists the name,  tableFieldName corresponding to the name in the field file, tableFieldType, and dimensionType as shown in \textbf{table ??}.
+\begin{center}
+\begin{tabular}{ |c|c|c|c| }
+\hline
+Item & Options & Description \\
+\hline
+name & & unique values \\
+\hline
+\multirow{5}{*}{fieldType} & UserKey & user id \\\cline{2-3}
+& Action & birth/cohort events \\\cline{2-3}
+& ActionTime & time \\\cline{2-3}
+& Metric & aggregation values \\\cline{2-3}
+& Segment & normal string \\
+\hline
+\end{tabular}
+\end{center}
+
+
+\begin{center}
+\begin{tabular}{ | p{8em} | p{5em} | p{8em} | }
+\hline
+Item & Options & Description \\
+\hline
+name & & unique values \\
+\hline
+tableFieldName & & according to the name in fields \\
+\hline
+\multirow{3}{*}{dimensionType (only for dimensions)} & NORMAL & user id \\\cline{2-3}
+& PROPERTY &  \\\cline{2-3}
+& CALC & \\
+\hline
+tableFieldType (only for dimensions) & Metric & \\
+\hline
+\multirow{2}{*}{aggregator (only for measures)} & RETENTION & \\\cline{2-3}
+& ?? & \\
+\hline
+\end{tabular}
+\end{center}
+
+The data we required includes a CSV file of user activity records dataset, and two auxiliary YAML files stating the fields and dimensions/measures of the dataset respectively. The activity records should be sorted by user id, and the records for each user are in chronological order, which facilitates finding the birth activity tuple. It is a ubiquitous format for data analysis, especially cohort analysis, and reasonably simple to achieve once and for all. The field file lists the name, fieldType, and dataType for each column in the dataset, while the dimensions/measures file lists the name,  tableFieldName, tableFieldType, dimensionType and aggregator as shown in \textbf{table ??}.
 
 The Cohana engine consists of parser, catalog, query executor and storage manager. The last two are the cores to support efficient cohort queries. The storage manager applies a chunking scheme and various compression techniques. To be more specific, we partition the data into chunks horizontally where every chunk stores precisely activity tuples of one user. Afterwards, different compression schemes are employed on columns regarding their types, i.e., Run-Length-Encoding for user identity column, two-level compression for string column and delta encoding scheme for integer column. On the other hand, the query executor generates a logical query plan in the form of operator tree from the original cohort query and optimized by birth selections. After being executed on each data chunk in the storage manager, the query plan merge and present the results.
 
