@@ -9,6 +9,7 @@
 %
 \documentclass[10pt,conference,letterpaper]{IEEEtran}
 \usepackage{times,amsmath}
+\usepackage{multirow}
 %
 \title{Cohana Demo}
 %
@@ -93,28 +94,48 @@ As discussed in the previous section, a typical Cohort analysis requires definin
 
 \subsection{System Architecture}
 
+\begin{center}
+\begin{tabular}
+\hline
+Item& Options & Description \\
+\hiline
+name& & unique values \\
+\hiline
+\multirow{5}{fieldType} & UserKey & user id \\
+& Action & birth/cohort events \\
+& ActionTime & time \\
+& Metric & aggregation values \\
+& Segment & normal string \\
+\end{tabular}
+\end{center}
+
 Figure 1 outlines the architecture including three components, i.e., data, Cohana engine and web interface, and data flow among the components.
 
-\textbf{data we need: data set in csv format, table (describing the schema, on web interface?), cube (dimension and measure), dimension (automatically generated?) }
+The data we required includes a CSV file of user activity records dataset, and two auxiliary YAML files stating the fields and dimensions of the dataset respectively. The activity records should be sorted by user id, and the records for each user are in chronological order, which facilitates finding the birth activity tuple. It is a ubiquitous format for data analysis, especially cohort analysis, and reasonably simple to achieve once and for all. The field file lists the name, fieldType, and dataType for each column in the dataset, while the dimension file lists the name,  tableFieldName corresponding to the name in the field file, tableFieldType, and dimensionType as shown in \textbf{table ??}.
 
-The Cohana engine consists of parser, catalog, query executor and storage manager. The last two are the cores to support efficient cohort queries. The storage manager applies a chunking scheme and various compression techniques. To be more specific, we partition the data into chunks horizontally where every chunk stores precisely activity tuples of one user. Afterwards, different compression schemes are employed on columns regarding their types, i.e., Run-Length-Encoding for user identity column, two-level compression for string column and delta encoding scheme for integer column. On the other hand, the query executor generates a logical query plan in the form operator tree from the original cohort query and optimized by birth selections. After being executed on each data chunk in the storage manager, the query plan merge and present the results.
+The Cohana engine consists of parser, catalog, query executor and storage manager. The last two are the cores to support efficient cohort queries. The storage manager applies a chunking scheme and various compression techniques. To be more specific, we partition the data into chunks horizontally where every chunk stores precisely activity tuples of one user. Afterwards, different compression schemes are employed on columns regarding their types, i.e., Run-Length-Encoding for user identity column, two-level compression for string column and delta encoding scheme for integer column. On the other hand, the query executor generates a logical query plan in the form of operator tree from the original cohort query and optimized by birth selections. After being executed on each data chunk in the storage manager, the query plan merge and present the results.
 
 The web interface, implemented under Django framework, is responsible for all user interactions such as loading data, composing queries, and displaying visualized results. As long as user specify the dataset, the web interface will send it to the Cohana engine and extract the column information for options of cohort analysis. The web interface structures the birth event, cohort selection, and age in a natural-language way, such that users can map their requirements into the options with ease. After that, the options selected are translated into JSON file in the format requested by Cohana engine. In seconds, the result is sent back, parsed and visualized on the web page.
 
 \section{Demonstration Outlines}
 
-We will walk through the whole system on the medical example in the Introduction section to illustrate the usage of the web interface for cohort analysis. Notice that, though the example is in medical area, such analysis is common in various domain and could be elegantly handled by our system.
+We will walk through the whole system on the medical example in the Introduction section to illustrate the usage of the web interface for cohort analysis. Notice that, though the example is in medical area, such analysis is common in various domains and could be elegantly handled by our system.
 
+For the sake of confidentiality, the data we use for the demo are generated according to the schema of real health care data, while complying with the distributions in the original data to be as representative as possible. As shown in the table1, we have seven columns in the tabulated data, i.e., id, birthyear, diag-code, medicine, lab test, attribute and time. Id is a unique identifier for each patient, and birth year and time are unambiguous. Diag-code contains a particular code for the disease diagnosed when admitted. When a patient is in the hospital for more than one day, the diag-code is likely to be empty in the following days. The medicine column indicates the prescription issued to the patient, and surely it is not valued in all records. The lab test means the type of test patients take and the attribute declare the test result. For example, the first row states patient0 born in 1953 was admitted on January 1st, 2016. His got 9.39 on Labtest-B, diagnosed Disease-B and issued Medicine-A. Then according to the second row, he took Medicine-A one more time and got 6.28 on Labtest-B.
 
+The first step we need to do on the web page is to upload the CSV and YAML files. As long as the Cohana engine receives the files, the web page navigates us to the Cohort Analysis page and equips the options on that page with the names in the YAML files.
 
+According to the example, 1) we consider only patients who have disease B; 2) the birth event is taking medicine A two times; 3) the age is one day; 4) we aggregate by the count of abnormal values in lab-test C since birth. From the decomposition of the requirement, the only thing we need to do is fit the sub-requirement into our cohort options on the web page. In the Global Options, we measure the \emph{activity\textunderscore number} over \emph{lab test: C} where \emph{age range is 1 to 30 days} by default. We also offer other measure options like retention or money. The next selection is on user which can be unchecked if we conduct on all users. Under our context, we choose \emph{Their diag-code is B} while leaving the frequency with the default value in \emph{any 7 days}. We can cast more constraints on the records, such as \emph{Their time is 2015-01-01 - 2015-12-31} to analyze the data in 2015 only, by ticking the \textbf{+} button on the right. In the Cohort Selection, we realize the birth event by selecting \emph{Their medicine is Medicine-A} and the frequency to be \emph{2-2 times}. If multiple birth events are selected by ticking the \textbf{+} button, a patient is regarded born only when all the birth events are met. Finally we \emph{Group by birthyear} in the range of \emph{1937 to 1997 scaled 10}, meaning we group the patients with a 10-year slice from 20 to 70 years old.
 
-Explain options on the web page, and show how to solve the example problem.
+Within seconds of submitting the requirement, a line chart and a heatmap chart of cohort analysis result will be displayed respectively under the cohort options. In the line chart, the x-axis represents the age of patients since birth, days after taking two times of Medicine A in our context, and y-axis represents the aggregated result, i.e., the number of patients detected abnormal in the lab test. Each line stands for a group of patients in the different birth year. The line chart, answering the cohort query numerically, not only illustrates the trend of user behavior in various groups along the time but offers a sharp contrast of behavior among groups. The other heatmap chart is axised with age and group. Each block in the chart accounts for the number of patients living up to the cohort conditions in that group and age compared to the number when born. The first column, on behalf of age 0, is sure to value 100\%. The blocks with different color depths give spontaneous expression to the relationship between age and user behavior and may indicate deeper insights on the user behavior of the different group. The two charts explain the data in absolute and relative way respectively. For example, more young patients are active on the side effect, suggested by the high values in the line chart, while elder patients take longer to be accustomed to medicine as the color retains deep in the heatmap chart.
 
-Explain the results (x/y axis and values). with support of third-party library, display different types of charts.
+What's more, we provide a wide variety of operations on the chart such as zooming in and changing the chart type, as shown in the toolbar above, with the help of a third-party library. These functions afford immediate responses to visualization exploration, helpful for further data excavation.
 
 \section{Related Work and Conclusion}
 
 MixPanel. Amplitude. 
+
+The demonstration shows a power and comprehensive tool for cohort analysis while keeping the operations as simple and intuitive as possible. Benefit from ultra efficiency of Cohana engine, the users can conduct report or verify their ideas in no time. Besides, the three cohort definition, though concise, covers a broad range of practical data analysis needs in various domains. Further, the rich chart operations provide better understanding and deeper insight of user behavior.
 
 %\section*{Acknowledgment}
 
