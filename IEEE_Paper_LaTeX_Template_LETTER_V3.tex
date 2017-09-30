@@ -13,7 +13,7 @@
 \usepackage{graphicx}
 \graphicspath{ {images/} }
 %
-\title{Cohana Demo}
+\title{An interactive tool for cohort analyzing systems}
 %
 %\author{%
 % author names are typeset in 11pt, which is the default size in the author block
@@ -108,36 +108,34 @@ Figure \ref{fig:sys_arch} outlines the architecture including three components, 
 
 \begin{table}[h!]
 \begin{center}
-    \begin{tabular}{ |c|c|c| }
+    \begin{tabular}{ |c|c| }
         \hline
-        Item & Options & Description \\
+        Options & Description \\[0.5ex] 
+        \hline\hline
+        User ID & user identity \\
         \hline
-        name & & unique values \\
+        Event & action the user performs\\
         \hline
-        \multirow{5}{*}{fieldType} & UserKey & user id \\\cline{2-3}
-            & Action & birth/cohort events \\\cline{2-3}
-            & ActionTime & time \\\cline{2-3}
-            & Metric & aggregation values \\\cline{2-3}
-            & Segment & normal string \\
+        Event Related & other string columns\\
         \hline
-        \multirow{2}{*}{dataType} & String & String \\\cline{2-3}
-            & Int32 & Numeric values including time \\
+        Value & other integer columns\\
+        \hline
+        Time & action time \\
         \hline
     \end{tabular}
 \end{center}
-\caption{fields YAML file schema}
+\caption{Schema Selection for the Dataset}
 \label{table:fields}
 \end{table}
 
 
 \begin{table}[h!]
 \begin{center}
-    \begin{tabular}{ | p{8em} | p{5em} | p{8em} | }
+    \begin{tabular}{ | p{5em} | p{8em} | }
         \hline
-        Item & Options & Description \\
+        Options & Description \\
         \hline
-        name & & unique values \\
-        \hline
+        Retention & Number of users 
         tableFieldName & & according to the name in fields \\
         \hline
         \multirow{3}{*}{dimensionType (only for dimensions)} & NORMAL & user id \\\cline{2-3}
