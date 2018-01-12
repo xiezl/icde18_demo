@@ -1,34 +1,45 @@
 \section{Introduction}
 %
-In an era where most user activity is electronically recorded either actively or passively, a consensus has been reached that we can gain insights towards user behavior by mining the large amounts of accumulated user behavioral data.
+In an era where most user activity is electronically recorded, the data analysts can gain insights towards user behavior by mining the large amounts of accumulated data.
 %With the maturity of data storage and cleansing techniques, we are increasingly keen on analyzing and explaining the data from new angles instead of optimizing the old-fashioned data analysis methods.
-This, however, brings in new challenges that standard analytic techniques, such as SQL Query, cannot easily overcome. 
-For instance, we need plentiful complicated GROUP BY and JOIN operators to select the users who change their behaviors over time.
+This, however, brings in new challenges that standard analytic techniques, such as SQL Query, cannot easily overcome, especially for those analysis in new angles. 
+For example, cohort analysis, originating from social science\cite{glenn2005cohort}, needs to collect users who change their behaviors over time dimension.
+To implement this, plentiful complicated GROUP BY and JOIN operators are needed, which undoubtedly consumes quite a long time to process.
+% For instance, we need plentiful complicated GROUP BY and JOIN operators to select the users who change their behaviors over time.
+
+Hence, we has proposed COHANA~\cite{jiang2016cohort} recently to tackle the challenge.
+This work encompasses the design of cohort operators and implements an efficient cohort query processing engine. It defines cohort query in a more concise and accurate standard than its SQL equivalent, and the specially designed storage manager and query executor in COHANA grants performance superiority against traditional database systems. 
+
+However, the complexity of building the cohort query, which is another challenge for data analysts using traditional SQL tools, is still a pain for COHANA according to our experience utilizing the system in the industry.
+The following example is a practical scenario for cohort analysis in medical fields:
 
 
-Cohort analysis, originating from social science\cite{glenn2005cohort}, fits well into the analysis of user behavior by collectively exploring the impact of two factors, namely \emph{social change} and \emph{age}, which are considered to be the major source affecting user behavior. Typically, for a set of selected users, cohort analysis groups them into different cohorts based on how they perform a certain \textbf{birth event}, and measures how the behavior of each cohort evolves with time thereafter.
 %There are two decisive factors affecting user behavior in cohort analysis: age and social change. Here, age is defined by the number of passed time unit after the selected user fulfill certain given behaviour patterns while social change is how the entire society evolves over the time. 
 %Cohort analysis studies user behavior by introducing the concept of \textbf{birth event}, which determines the birth time and identifies the \textbf{cohort} for each user according to the given cohort composition. Then, the \textbf{age} of each user activity is derived from the time passed since the first birth event. Finally, an \textbf{aggregation} method is used to measure how the behavior of users in each cohort evolves over age.
-The following example is a practical scenario for cohort analysis in medical fields.
+% The following example is a practical scenario for cohort analysis in medical fields.
 
 \emph{\textbf{Example:} A hospital wants to know the side effects of a new medicine A on patients cohorted by different physical ages who are diagnosed with disease B. The patient is monitored after taking the medicine at least 2 times by observing abnormal values in daily-conducted lab-test C.}
 
-To solve the problem described in the example, complex GROUP BY and JOIN operators must be imported in traditional databases.
-Furthermore, it is painful to compose the correct SQL queries for the example.
-Nonetheless, this example can be readily mapped onto a cohort analysis task, as we shall see below.
+To solve the problem described in the example, complex GROUP BY and JOIN operators must be imported in traditional databases with precise order and expressions.
+Medicians may spend hours to write such a query even with adequate computer science background, no matter how long is going to cost for the database to process.
+% Furthermore, it is painful to compose the correct SQL queries for the example.
+Moreover, although COHANA engine can efficiently handle this example, it is still hard to understand the terms used in the query submitted to the engine for the medicians.
+Thus. they are often unable to compose the correct query format.
+
+% To solve the problem described in the example, complex GROUP BY and JOIN operators must be imported in traditional databases.
+% Furthermore, it is painful to compose the correct SQL queries for the example.
+% Nonetheless, this example can be readily mapped onto a cohort analysis task, as we shall see below.
 %cohort analysis can be easily mapped   handle this example with the aforementioned definitions.
 % Though it is troublesome to solve for SQL GROUP BY, the problem can be handled easily by cohort analysis by determining the three definitions are well defined.
 
-To embrace the advantages of cohort analysis, COHANA\cite{jiang2016cohort} has been proposed recently. 
-This work encompasses the design of cohort operators and implements an efficient cohort query processing engine. It defines cohort query in a more concise and accurate standard than its SQL equivalent, and the specially designed storage manager and query executor in COHANA grants performance superiority against traditional database systems. 
 
-Despite all the efforts done in COHANA system, we find out that it is still cumbersome to build cohort queries as easy as we expect.
-To overcome this issue, we propose a web-based tool that runs on top of COHANA to provide users with an intuitive and practical cohort querying service. 
+% Despite all the efforts done in COHANA system, we find out that it is still cumbersome to build cohort queries as easy as we expect.
+To overcome this issue, we propose a web tool that runs on top of COHANA to provide users with an intuitive and practical cohort querying service. 
 This tool lets users determine the parameters of cohort analysis by selecting options described in natural language on the web page, instead of writing queries accepted by COHANA, which are of a json format.  
 It is especially helpful for analysts who lack the knowledge of defining the cohort analysis in pre-defined terminologies, such as ``age" and ``birth event". 
 Furthermore, the result of the cohort query returned by COHANA is visualized,
-which is also useful for the analysts to evaluate their queries and generate business reports.
-The ultimate goal of this tool is to help analysts gain insights to the data swiftly, accurately, and intuitively.
+which plays a key role for the analysts to evaluate their queries and generate business reports.
+Generally, the ultimate goal of this tool is to help analysts gain insights to the data swiftly, accurately, and intuitively.
 
 In this demo paper, we will give an overview of our system by introducing key concepts in cohort analysis along with our system architecture first. We then demonstrate the entire analysis process in the context of the running example, including the data preparation, cohort selection, and result visualization.
 Although our demo is a general tool for cohort analysis, we shall focus on the medical area in the rest of this paper for better illustration and explanation.
@@ -37,7 +48,8 @@ Although our demo is a general tool for cohort analysis, we shall focus on the m
 In this section, we start with three key definitions presented in all cohort queries, and then depict the overall system architecture.  
 
 \subsection{Query Definition}
-As discussed in the previous section, a typical cohort analysis requires the definition of \textbf{cohort}, \textbf{age}, and \textbf{aggregation}. 
+
+A typical cohort analysis requires the definition of \textbf{cohort}, \textbf{age}, and \textbf{aggregation}. 
 
 \textbf{Cohort}: Cohort refers to a group of users sharing certain common characteristics when born with respect to a given sequence of birth events. In other words, a user is born immediately after completing the birth sequence and enters a cohort accordingly. It is worth noting that we use a event sequence, instead of a single event, to determine the birth of users, as we believe this can profile user more accurately and hence enable more various and representative cohorts. For the running example, the birth event sequence is defined as taking medicine for at least twice, and patients are then grouped into cohorts based on the physical age when taking the medicines. %It is worth noting that although a user's characteristics may change over time, its cohort is determined by the characteristics that user has at the time of birth.
 
@@ -45,6 +57,8 @@ As discussed in the previous section, a typical cohort analysis requires the def
 Another patient taking the same lab test on March 4th for the first time will also be at age 1 on March 5th, regardless of the difference in birth times. The other age type is defined by the occurrence of a certain event. For example, we can use the admission to define the age of patients such that a patient is at age 1 before the first admission since born.
 
 \textbf{Aggregation}: Aggregation refers to the calculation function performed on the selected user activity records within a same age. Users can perform aggregations as simple as counting the number of occurrences of a particular event, or as complicated as fitting a probability distribution. For example, we can check the retention rate of patients' re-admission to the hospital by counting patients' admission records every month (i.e., one unit of age) after being discharged at the first time (i.e., the birth event).
+
+Cohort analysis fits well into the analysis of user behavior by collectively exploring the impact of two factors, namely \emph{social change} and \emph{age}, which are considered to be the major source affecting user behavior. Typically, for a set of selected users, cohort analysis groups them into different cohorts based on how they perform a certain \textbf{birth event}, and measures how the behavior of each cohort evolves with time thereafter.
 
 \subsection{System Architecture}
 
