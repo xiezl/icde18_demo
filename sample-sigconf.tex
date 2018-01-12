@@ -1,0 +1,221 @@
+\documentclass[sigconf]{acmart}
+
+\usepackage{booktabs} % For formal tables
+\usepackage{times,amsmath}
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{url}
+\usepackage{listings,xcolor}
+\graphicspath{ {images/} }
+\lstset{
+    string=[s]{"}{"},
+    stringstyle=\color{blue},
+    comment=[l]{:},
+    commentstyle=\color{black},
+}
+% Copyright
+%\setcopyright{none}
+%\setcopyright{acmcopyright}
+%\setcopyright{acmlicensed}
+% \setcopyright{rightsretained}
+%\setcopyright{usgov}
+%\setcopyright{usgovmixed}
+%\setcopyright{cagov}
+%\setcopyright{cagovmixed}
+
+
+% DOI
+% \acmDOI{10.475/123_4}
+
+% ISBN
+% \acmISBN{123-4567-24-567/08/06}
+
+%Conference
+% \acmConference[WOODSTOCK'97]{ACM Woodstock conference}{July 1997}{El
+%   Paso, Texas USA}
+% \acmYear{1997}
+% \copyrightyear{2016}
+
+
+% \acmArticle{4}
+% \acmPrice{15.00}
+
+% These commands are optional
+%\acmBooktitle{Transactions of the ACM Woodstock conference}
+% \editor{Jennifer B. Sartor}
+% \editor{Theo D'Hondt}
+% \editor{Wolfgang De Meuter}
+
+
+\begin{document}
+\title{Cohort Analysis with Ease}
+% \titlenote{Produces the permission block, and
+%   copyright information}
+% \subtitle{Extended Abstract}
+% \subtitlenote{The full version of the author's guide is available as
+%   \texttt{acmart.pdf} document}
+
+
+% \author{Ben Trovato}
+% \authornote{Dr.~Trovato insisted his name be first.}
+% \orcid{1234-5678-9012}
+% \affiliation{%
+%   \institution{Institute for Clarity in Documentation}
+%   \streetaddress{P.O. Box 1212}
+%   \city{Dublin}
+%   \state{Ohio}
+%   \postcode{43017-6221}
+% }
+% \email{trovato@corporation.com}
+
+% \author{G.K.M. Tobin}
+% \authornote{The secretary disavows any knowledge of this author's actions.}
+% \affiliation{%
+%   \institution{Institute for Clarity in Documentation}
+%   \streetaddress{P.O. Box 1212}
+%   \city{Dublin}
+%   \state{Ohio}
+%   \postcode{43017-6221}
+% }
+% \email{webmaster@marysville-ohio.com}
+
+% \author{Lars Th{\o}rv{\"a}ld}
+% \authornote{This author is the
+%   one who did all the really hard work.}
+% \affiliation{%
+%   \institution{The Th{\o}rv{\"a}ld Group}
+%   \streetaddress{1 Th{\o}rv{\"a}ld Circle}
+%   \city{Hekla}
+%   \country{Iceland}}
+% \email{larst@affiliation.org}
+
+% \author{Valerie B\'eranger}
+% \affiliation{%
+%   \institution{Inria Paris-Rocquencourt}
+%   \city{Rocquencourt}
+%   \country{France}
+% }
+% \author{Aparna Patel}
+% \affiliation{%
+%  \institution{Rajiv Gandhi University}
+%  \streetaddress{Rono-Hills}
+%  \city{Doimukh}
+%  \state{Arunachal Pradesh}
+%  \country{India}}
+% \author{Huifen Chan}
+% \affiliation{%
+%   \institution{Tsinghua University}
+%   \streetaddress{30 Shuangqing Rd}
+%   \city{Haidian Qu}
+%   \state{Beijing Shi}
+%   \country{China}
+% }
+
+% \author{Charles Palmer}
+% \affiliation{%
+%   \institution{Palmer Research Laboratories}
+%   \streetaddress{8600 Datapoint Drive}
+%   \city{San Antonio}
+%   \state{Texas}
+%   \postcode{78229}}
+% \email{cpalmer@prl.com}
+
+% \author{John Smith}
+% \affiliation{\institution{The Th{\o}rv{\"a}ld Group}}
+% \email{jsmith@affiliation.org}
+
+% \author{Julius P.~Kumquat}
+% \affiliation{\institution{The Kumquat Consortium}}
+% \email{jpkumquat@consortium.net}
+
+\author{Zhongle Xie}
+\email{zhongle@comp.nus.edu.sg}
+\affiliation{\institution{National University of Singapore}}
+
+% \author{Zhongle Xie$^{\dagger}$\ \ Qingchao Cai$^{\dagger}$\ \ Fei Hei$^{\dagger}$\ \ Gene Yan Ooi$^{*}$\ \ Weilong Huang$^{*}$\ \ Beng Chin Ooi$^{\dagger}$\ }
+% \email{}
+% \affiliation{
+% \vspace{-10pt}
+% $^{\dagger}$\{zhongle, caiqc, hef, ooibc\}@comp.nus.edu.sg \ \ \ \ 
+% $^{*}$\{gene, weilong\}@shentilium.com }
+% \affiliation{\institution{$^{\dagger}$National University of Singapore \ \ \ \ $^{*}$Shentilium Private Limited}}
+
+\author{Qingchao Cai}
+\email{caiqc@comp.nus.edu.sg}
+\affiliation{\institution{National University of Singapore}}
+
+\author{Fei He}
+\email{hef@comp.nus.edu.sg}
+\affiliation{\institution{National University of Singapore}}
+% \thanks{The names of the authors are listed in alphabetical order}
+
+\author{Gene Yan Ooi}
+\email{gene@shentilium.com}
+\affiliation{\institution{Shentilium Private Limited}}
+
+\author{Weilong Huang}
+\email{weilong@shentilium.com}
+\affiliation{\institution{Shentilium Private Limited}}
+
+\author{Beng Chin Ooi}
+\email{ooibc@comp.nus.edu.sg}
+\affiliation{\institution{National University of Singapore}}
+% The default list of authors is too long for headers.
+\renewcommand{\shortauthors}{Z. Xie et al.}
+
+
+\begin{abstract} 
+The tremendous volume of user behavior records generated in various domains provides data analysts new opportunities to mine valuable insights among the users. Cohort analysis, which aims to find user behavioral trends hidden in time series, is one of the most commonly used techniques. Since traditional database systems suffer from both operability and efficiency when processing cohort analysis queries, we proposed COHANA\cite{jiang2016cohort}, a query processing system specialized for cohort analysis. In order to make COHANA easy-to-use, especially for users without strong backgrounds in databases, we further present a comprehensive and powerful tool in this demo, covering the major use cases in cohort analysis with intuitive and accessible operations. We demonstrate that analysts can easily adapt COHANA to their own use with provided visualizations which can help verifying their analysis assumptions and inconspicuous trends hidden in user behavior data.\\
+
+Demo Video: \url{https://youtu.be/r28_jBD9qKg}
+\end{abstract}
+
+%
+% The code below should be generated by the tool at
+% http://dl.acm.org/ccs.cfm
+% Please copy and paste the code instead of the example below.
+%
+% \begin{CCSXML}
+% <ccs2012>
+%  <concept>
+%   <concept_id>10010520.10010553.10010562</concept_id>
+%   <concept_desc>Computer systems organization~Embedded systems</concept_desc>
+%   <concept_significance>500</concept_significance>
+%  </concept>
+%  <concept>
+%   <concept_id>10010520.10010575.10010755</concept_id>
+%   <concept_desc>Computer systems organization~Redundancy</concept_desc>
+%   <concept_significance>300</concept_significance>
+%  </concept>
+%  <concept>
+%   <concept_id>10010520.10010553.10010554</concept_id>
+%   <concept_desc>Computer systems organization~Robotics</concept_desc>
+%   <concept_significance>100</concept_significance>
+%  </concept>
+%  <concept>
+%   <concept_id>10003033.10003083.10003095</concept_id>
+%   <concept_desc>Networks~Network reliability</concept_desc>
+%   <concept_significance>100</concept_significance>
+%  </concept>
+% </ccs2012>
+% \end{CCSXML}
+
+% \ccsdesc[500]{Computer systems organization~Embedded systems}
+% \ccsdesc[300]{Computer systems organization~Redundancy}
+% \ccsdesc{Computer systems organization~Robotics}
+% \ccsdesc[100]{Networks~Network reliability}
+
+
+% \keywords{ACM proceedings, \LaTeX, text tagging}
+
+
+\maketitle
+
+\input{samplebody-conf}
+
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{ref_list}
+% \bibliography{sample-bibliography}
+
+\end{document}
