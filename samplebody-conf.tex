@@ -1,4 +1,5 @@
 \section{Introduction}
+\label{sec::intro}
 %
 In an era where most user activity is electronically recorded, the data analysts can gain insights towards user behavior by mining the large amounts of accumulated data.
 %With the maturity of data storage and cleansing techniques, we are increasingly keen on analyzing and explaining the data from new angles instead of optimizing the old-fashioned data analysis methods.
@@ -48,17 +49,24 @@ Although our demo is a general tool for cohort analysis, we shall focus on the m
 In this section, we start with three key definitions presented in all cohort queries, and then depict the overall system architecture.  
 
 \subsection{Query Definition}
+In cohort analysis, the behavior user performed are called ``event", which is usually recorded as a string column in database. 
+There are four key concepts presented in the COHANA paper~\cite{jiang2016cohort}, i.e., \textbf{User Selection}, \textbf{Age}, \textbf{Cohort} and \textbf{Metric}.
+However, to define the cohort query in a more powerful way, the definitions are further extended as following:
+% A typical cohort analysis requires the definition of \textbf{birth},  \textbf{age}, \textbf{metric} and \textbf{cohort}. 
 
-A typical cohort analysis requires the definition of \textbf{cohort}, \textbf{age}, and \textbf{aggregation}. 
+\textbf{User Selection}: A user is selected into the cohort query result if and only if the user performs a given sequence of events. This selection is called ``user birth" and the given sequence is called ``birth events" accordingly. It is worth noting that a event sequence, instead of a single event, is employed to make the selection more precise and comprehensive.
+For the running example, the birth events are ordered and defined as: (1) the patient has taken medicine A at least twice; (2) the patient is observed abnormal values in lab-test C afterwards.
 
-\textbf{Cohort}: Cohort refers to a group of users sharing certain common characteristics when born with respect to a given sequence of birth events. In other words, a user is born immediately after completing the birth sequence and enters a cohort accordingly. It is worth noting that we use a event sequence, instead of a single event, to determine the birth of users, as we believe this can profile user more accurately and hence enable more various and representative cohorts. For the running example, the birth event sequence is defined as taking medicine for at least twice, and patients are then grouped into cohorts based on the physical age when taking the medicines. %It is worth noting that although a user's characteristics may change over time, its cohort is determined by the characteristics that user has at the time of birth.
-
-\textbf{Age}: The age of a user is defined as the number of time units passed since her birth. We support two types of time units. The first one is calendar time period, such as day/week/month. For example, if we define the birth event as taking lab test and time unit as one day, a patient whose first recorded lab test is on January 1st will be at age 1 on January 2nd. 
+\textbf{Age}: The age of a selected user is defined as the number of time units passed since the birth. Two types of time units are supported in the query. The first one is calendar time unit, such as day/week/month. For example, if we define the birth event as taking lab test and the time unit as one day, a patient whose first recorded lab test is on January 1st will be at age 1 on January 2nd. 
 Another patient taking the same lab test on March 4th for the first time will also be at age 1 on March 5th, regardless of the difference in birth times. The other age type is defined by the occurrence of a certain event. For example, we can use the admission to define the age of patients such that a patient is at age 1 before the first admission since born.
+The patient will be at age 2 if unfortunately he is sick again and get re-admitted by the hospital.
 
-\textbf{Aggregation}: Aggregation refers to the calculation function performed on the selected user activity records within a same age. Users can perform aggregations as simple as counting the number of occurrences of a particular event, or as complicated as fitting a probability distribution. For example, we can check the retention rate of patients' re-admission to the hospital by counting patients' admission records every month (i.e., one unit of age) after being discharged at the first time (i.e., the birth event).
+\textbf{Cohort}: Cohort refers to a group of users sharing certain common characteristics when born. In other words, a user is born immediately after completing the birth events and enters a cohort accordingly. For the running example, the patients who perform the birth events are cohorted by one of their common characteristics, namely the physical age.
+%It is worth noting that although a user's characteristics may change over time, its cohort is determined by the characteristics that user has at the time of birth.
 
-Cohort analysis fits well into the analysis of user behavior by collectively exploring the impact of two factors, namely \emph{social change} and \emph{age}, which are considered to be the major source affecting user behavior. Typically, for a set of selected users, cohort analysis groups them into different cohorts based on how they perform a certain \textbf{birth event}, and measures how the behavior of each cohort evolves with time thereafter.
+\textbf{Metric}: Metric refers to the result of user-defined calculation function, denoted as metric function and performed on the generated cohorts within a same age. Users can define metric function as simple aggregations like counting the number of occurrences of a particular event, or as complicated validation like fitting a probability distribution. For example, we can check the retention rate of patients' re-admission to the hospital by counting patients' admission records every month (i.e., one unit of age) after being discharged at the first time (i.e., the birth event).
+
+Cohort analysis fits well into the analysis of user behavior by collectively exploring the impact of two factors, namely \emph{social change} and \emph{age}, which are considered to be the major source affecting user behavior. Typically, for a set of selected users, cohort analysis groups them into different cohorts based on how they perform a certain birth event, and measures how the behavior of each cohort evolves with time thereafter.
 
 \subsection{System Architecture}
 
@@ -72,9 +80,9 @@ Cohort analysis fits well into the analysis of user behavior by collectively exp
 Figure \ref{fig:sys_arch} outlines the system architecture of the entire system. The input of the system is the data in the green rectangle and there are two components of the system, i.e., the COHANA engine and the web interface, which are respectively surrounded by a blue and orange rectangle. 
 
 The input of the system is actually a file containing the all the user records in the CSV format. 
-Besides user activities and the associated time, the file can also 
+Besides user behaviors and the associated timestamp, the file can also 
 %The only data we required is a CSV file of user activity records, 
-including user details and activity details.
+including user details and other information.
 The data records of a single user are cluster together in chronological order. 
 This sorting alignment for the records is a ubiquitous format for data analysis, and it aids the COHANA engine in the detection of the tuples containing the users' birth activities.
 
@@ -95,15 +103,16 @@ The interactive web interface for COHANA is implemented under Django\cite{django
 The web interface is responsible for all front-end user interactions such as uploading the dataset, constructing queries, and visualizing results. 
 It is also in charge of back-end data transfer and interactions with COHANA engine. 
 
-When applying the cohort analysis for their own dataset, users first specify the dataset to be analyzed via the user interface.
-The back end receives the dataset and pass its address to the COHANA engine, and extracts the needed column information for compression in the cohort analysis page. 
-Then, users map their analysis task from natural language to cohort query definitions via the web interface, including the birth event, cohort selection, and age constructors.
-The mapping is done easily with simple and clear options provided in the front end.
-Next, the options selected are translated into the format acceptable by COHANA engine on the back end. Finally, the processed result is sent back from COHANA engine and parsed and visualized on the web page.
+When applying the cohort analysis for their own dataset, users first import the dataset to be analyzed into COHANA engine via the user interface by either uploading the raw data or specifying a web address.
+The back end receives the dataset and pass the dataset to the engine, extracting the needed column information for compression in a cohort analysis page. 
+Then, users map their analysis task from natural language to cohort query definitions, including the user selection, cohort definition, age specification and metric calculation.
+This mapping is done easily with simple and clear options provided in the front end as we shall see below.
+Next, the options selected are translated into the format accepted by COHANA engine on the back end, which is further passed to the engine. 
+Finally, the processed result is sent back from COHANA engine and parsed by the back end. The front end visualizes the parsed result into tables or charts for users reference.
 
 \section{Demonstration Outlines}
 
-We will elaborate on the data preparation, the query selection, and result visualization with the aforementioned medical example in the Introduction section to explain cohort analysis process using our system. This example is quite representative in the medical context according to the doctors in collaboration.
+We elaborate on the data preparation, the query selection, and result visualization with the aforementioned medical example in Section~\ref{sec::intro} to explain cohort analysis process using our system. This example is quite representative in the medical context according to the doctors in collaboration.
 Although the data we use for this demonstration is not real due to confidential issues, we indeed force the fake dataset follow the schema of the real health care records and the distribution of the original dataset.
 It is worth mentioning that while the example resides in the medical domain, such analysis is common in various other domains and can likewise be elegantly handled by our system.
 
@@ -194,7 +203,7 @@ The storage manager in the COHANA engine will compress the data intelligently to
 \label{table:metrics}
 \end{table}
 
-The first step we need to do to apply the cohort analysis is to upload the CSV file and specify the schema of the data and the metrics to be evaluated as shown in Figure \ref{fig:upload}. 
+The first step we need to do applying the cohort analysis is to upload the CSV file and specify the schema of the data and the metrics to be evaluated as shown in Figure \ref{fig:upload}. 
 The descriptions for the options regarding the schema and metrics are shown in Table \ref{table:schema} and \ref{table:metrics}. 
 Here, we choose RETENTION as our metric for this problem to reflect the number of qualified patients in each age since their birth. 
 The web interface allows for assigning multiple metrics, such as choosing COUNT on the labtest column if the number of abnormal values is needed, or using SUM for the total occurrences of abnormal values. 
