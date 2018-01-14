@@ -79,8 +79,10 @@ The patient will be at age 2 if unfortunately he is sick again and get re-admitt
 \begin{figure}
     \centering
     \includegraphics[width=0.4\textwidth]{arch.png}
+    \vspace{-1em}
     \caption{System Architecture}
     \label{fig:sys_arch}
+    \vspace{-2em}
 \end{figure}
 
 Figure \ref{fig:sys_arch} outlines the system architecture of the entire system. The input of the system is the data in the green rectangle and there are two components of the system, i.e., the COHANA engine and the web interface, which are respectively surrounded by a blue and orange rectangle. 
@@ -116,6 +118,16 @@ Then, users map their analysis task from natural language to cohort query defini
 This mapping is done easily with simple and clear options provided in the front end as we shall see below.
 Next, the options selected are translated into the format accepted by COHANA engine on the back end, which is further passed to the engine. 
 Finally, the processed result is sent back from COHANA engine and parsed by the back end. The front end visualizes the parsed result into tables or charts for users reference.
+\begin{figure}
+% \begin{subfigure}{0.3\textwidth}
+    \centering
+    \includegraphics[width=0.9\linewidth]{upload_all_vertical.png}
+    \vspace{-1em}
+    \caption{Data Upload}
+    \label{fig:upload}
+% \end{subfigure}%
+    \vspace{-3em}
+\end{figure}
 
 \section{Demonstration Outlines}
 
@@ -141,32 +153,29 @@ The storage manager in the COHANA engine will compress the data intelligently to
 % \end{figure}
 
 
-\begin{figure*}
-\begin{minipage}{0.3\textwidth}
-% \begin{subfigure}{0.3\textwidth}
-    \centering
-    \includegraphics[width=0.9\linewidth]{upload_all_vertical.png}
-    \caption{Data Upload}
-    \label{fig:upload}
-% \end{subfigure}%
-\end{minipage}
-\begin{minipage}{0.38\textwidth}
+\begin{figure}
 % \begin{subfigure}{0.4\textwidth}
     % \centering
-    \includegraphics[width=0.96\linewidth]{query.png}
+    \includegraphics[width=0.96\linewidth]{query1.png}
+    \includegraphics[width=0.96\linewidth]{query2.png}
+    \vspace{-1em}
     \caption{Cohort Selection}
     \label{fig:cohort}
+    \vspace{-1em}
 % \end{subfigure}%
-\end{minipage}
-\begin{minipage}{0.3\textwidth}
+\end{figure}
+\begin{figure*}
 % \begin{subfigure}{0.3\textwidth}
     % \centering
-    \includegraphics[height=20em, width=0.99\linewidth]{image.jpg}
+    \includegraphics[height=15em, width=0.49\linewidth]{image1.png}
+    \vspace{-0.2em}
+    \includegraphics[height=15em, width=0.49\linewidth]{image2.png}
+    % \includegraphics[height=22em, width=0.99\linewidth]{image.jpg}
+    \vspace{-1em}
     \caption{Result Visualization}
     \label{fig:visual}
+    \vspace{-1em}
 % \end{subfigure}%
-\end{minipage}
-
 % \caption{Web Interface}
 \end{figure*}
 
@@ -180,7 +189,7 @@ The storage manager in the COHANA engine will compress the data intelligently to
         \hline
         Event & action the user performs\\
         \hline
-        Attributes & other string columns\\
+        Event Related & other string columns\\
         \hline
         Values & other integer columns\\
         \hline
@@ -190,6 +199,7 @@ The storage manager in the COHANA engine will compress the data intelligently to
 \end{center}
 \caption{Schema Selection for the Dataset}
 \label{table:schema}
+    \vspace{-3em}
 \end{table}
 
 \begin{table}[tb!]
@@ -208,6 +218,7 @@ The storage manager in the COHANA engine will compress the data intelligently to
 \end{center}
 \caption{Metrics Selection for the Dataset}
 \label{table:metrics}
+    \vspace{-3em}
 \end{table}
 
 The first step we need to conduct cohort analysis is to upload the CSV file and specify the schema of the data and the metrics to be evaluated as shown in Figure \ref{fig:upload}. 
